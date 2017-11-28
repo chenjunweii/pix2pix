@@ -1,0 +1,11 @@
+*.h5
+*.jpg
+only*
+patch*
+main
+ce
+Alphabet
+model/*
+test*
+
+
