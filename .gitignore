@@ -7,5 +7,6 @@ ce
 Alphabet
 model/*
 test*
-
+flt/*
+*.swp
 
