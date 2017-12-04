@@ -184,43 +184,43 @@ inline vector <Symbol> network::pix2pix_D(Symbol *inputs, Symbol *condition, int
 	auto fc3_sigmoid = sigmoid(fc3);
 	*/
 
-	auto conv1_1 = layer::conv("conv1_1_custom", features, weight, bias, aux, 64, "bn", isTraining, Shape(4,4), Shape(1,1), Shape(1,1));
-	auto conv1_2 = layer::conv("conv1_2", conv1_1, weight, bias, aux, 64, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
+	auto conv1_1 = layer::conv("conv1_1_custom", features, weight, bias, aux, 64, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
+	//auto conv1_2 = layer::conv("conv1_2", conv1_1, weight, bias, aux, 64, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
 	//auto pool1 = layer::maxpool("pool1", conv1_1);
 	
-	auto conv2_1 = layer::conv("conv2_1", conv1_2, weight, bias, aux, 128, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto conv2_2 = layer::conv("conv2_2", conv2_1, weight, bias, aux, 128, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
+	auto conv2_1 = layer::conv("conv2_1", conv1_1, weight, bias, aux, 128, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
+	//auto conv2_2 = layer::conv("conv2_2", conv2_1, weight, bias, aux, 128, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
 	//auto pool2 = layer::maxpool("pool2", conv2_1);
 
-	auto conv3_1 = layer::conv("conv3_1", conv2_2, weight, bias, aux, 256, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto conv3_2 = layer::conv("conv3_2", conv3_1, weight, bias, aux, 256, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto conv3_3 = layer::conv("conv3_3", conv3_2, weight, bias, aux, 256, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
+	auto conv3_1 = layer::conv("conv3_1", conv2_1, weight, bias, aux, 256, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
+	//auto conv3_2 = layer::conv("conv3_2", conv3_1, weight, bias, aux, 256, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
+	//auto conv3_3 = layer::conv("conv3_3", conv3_2, weight, bias, aux, 256, "bn", isTraining, Shape(3,3), Shape(2,2), Shape(1,1));
 	//auto pool3 = layer::maxpool("pool3", conv3_1, Shape(2,2), Shape(2,2), Shape(1,1));
 	
-	auto conv4_1 = layer::conv("conv4_1", conv3_2, weight, bias, aux, 512, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto conv4_2 = layer::conv("conv4_2", conv4_1, weight, bias, aux, 512, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto conv4_3 = layer::conv("conv4_3", conv4_2, weight, bias, aux, 512, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto pool4 = layer::maxpool("pool4", conv4_3, Shape(3,3), Shape(1,1), Shape(0,0));
+	auto conv4_1 = layer::conv("conv4_1", conv3_1, weight, bias, aux, 512, "bn", isTraining, Shape(1,1), Shape(1,1), Shape(1,1));
+	auto conv4_2 = layer::conv("conv4_2", conv4_1, weight, bias, 1, Shape(1,1), Shape(1,1), Shape(1,1), false);
+	//auto conv4_3 = layer::conv("conv4_3", conv4_2, weight, bias, aux, 512, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
+	//auto pool4 = layer::maxpool("pool4", conv4_3, Shape(3,3), Shape(1,1), Shape(0,0));
 
-	auto conv5_1 = layer::conv("conv5_1", pool4, weight, bias, aux, 512, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto conv5_2 = layer::conv("conv5_2", conv5_1,  weight, bias, aux, 512, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
-	auto conv5_3 = layer::conv("conv5_3", conv5_2, weight, bias, aux, 1, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1), false);
+	//auto conv5_1 = layer::conv("conv5_1", pool4, weight, bias, aux, 512, "bn", isTraining, Shape(3,3), Shape(1,1), Shape(1,1));
+	//auto conv5_2 = layer::conv("conv5_2", conv5_1,  weight, bias, aux, 512, "bn", isTraining, Shape(1,1), Shape(1,1), Shape(1,1));
+	//auto conv5_3 = layer::conv("conv5_3", conv5_2, weight, bias, aux, 1, "bn", isTraining, Shape(1,1), Shape(1,1), Shape(1,1), false);
 
 	//auto pool5 = layer::maxpool("pool5", conv5_3, Shape(3,3), Shape(2,2), Shape(0,0));
 	
-	auto fc1 = layer::fullyconnected("fcsggxxwwfs11", conv5_3, weight, bias, 1024);
+	//auto fc1 = layer::fullyconnected("fcsggxxwwfs11", conv5_3, weight, bias, 1024);
 	
-	auto fc1_sigmoid = sigmoid(fc1);
+	//auto fc1_sigmoid = sigmoid(fc1);
 
-	auto fc2 = layer::fullyconnected("fcss22", fc1_sigmoid, weight, bias, 1);
+	//auto fc2 = layer::fullyconnected("fcss22", fc1_sigmoid, weight, bias, 1);
 
-	auto fc2_sigmoid = sigmoid(fc2);
+	//auto fc2_sigmoid = sigmoid(fc2);
 	
-	vector <Symbol> l(2);
+	vector <Symbol> l(1);
 
-	l[0] = sigmoid(conv5_3);
+	l[0] = sigmoid(conv4_2);
 
-	l[1] = sigmoid(fc2_sigmoid);
+	//l[1] = fc2_sigmoid;
 
 	return l;
 

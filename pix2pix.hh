@@ -66,11 +66,11 @@ inline void pix2pix::build(){
 	
 	node["decision_fake_patch"] = decision_fake[0];
 
-	node["decision_fake"] = decision_fake[1];
+	//node["decision_fake"] = decision_fake[1];
 
 	node["decision_real_patch"] = decision_real[0];
 	
-	node["decision_real"] = decision_real[1];
+	//node["decision_real"] = decision_real[1];
 
 };
 
@@ -78,30 +78,30 @@ inline Symbol pix2pix::G_Loss(){
 
 	/* let generated image can be considered a real image, so use ones_like, not zeros_like */
 
-	auto generation_loss = mean(loss::cross_entropy(node["decision_fake"], ones_like("generate_loss", node["decision_fake"])));
+	//auto generation_loss = mean(loss::cross_entropy(node["decision_fake"], ones_like("generate_loss", node["decision_fake"])));
 	
 	auto generation_loss_patch = mean(loss::cross_entropy(node["decision_fake_patch"], ones_like("generate_loss_patch", node["decision_fake_patch"])));
 	
-	auto reconstruction_loss = mean(loss::cross_entropy(node["generated"], inputs));
+	auto reconstruction_loss = mean(loss::L1(node["generated"], inputs));
 
-	return MakeLoss("G_Loss", generation_loss + generation_loss_patch + reconstruction_loss);
+	return MakeLoss("G_Loss", generation_loss_patch + 100 * reconstruction_loss);
 }
 
 
 inline Symbol pix2pix::D_Loss(){	
 
-	Symbol real_decision_loss = mean(loss::cross_entropy(node["decision_real"],
-				ones_like("real_loss", node["decision_real"])));
+	//Symbol real_decision_loss = mean(loss::cross_entropy(node["decision_real"],
+	//			ones_like("real_loss", node["decision_real"])));
 	
-	Symbol fake_decision_loss = mean(loss::cross_entropy(node["decision_fake"],
-				zeros_like("fake_loss", node["decision_fake"])));
+	//Symbol fake_decision_loss = mean(loss::cross_entropy(node["decision_fake"],
+	//			zeros_like("fake_loss", node["decision_fake"])));
 
 	Symbol real_decision_loss_patch = mean(loss::cross_entropy(node["decision_real_patch"],
 				ones_like("real_loss_patch", node["decision_real_patch"])));
 	
 	Symbol fake_decision_loss_patch = mean(loss::cross_entropy(node["decision_fake_patch"],
 				zeros_like("fake_loss_patch", node["decision_fake_patch"])));
-	return MakeLoss("D_Loss", real_decision_loss + fake_decision_loss + real_decision_loss_patch + fake_decision_loss_patch);
+	return MakeLoss("D_Loss", real_decision_loss_patch + fake_decision_loss_patch);
 }
 
 
@@ -141,7 +141,7 @@ inline void pix2pix::train(int epoch, int device_id){
 	
 	g.InferShape(arg["g"], &inf["g"]["in"], &inf["g"]["aux"], &inf["g"]["out"]);
 	
-	node["decision_real"].InferShape(arg["e"], &inf["test"]["in"], &inf["test"]["aux"], &inf["test"]["out"]);
+	node["decision_real_patch"].InferShape(arg["e"], &inf["test"]["in"], &inf["test"]["aux"], &inf["test"]["out"]);
 
 	cout << "D Shape : " << Shape(inf["test"]["out"][0]) << endl;
 
@@ -266,10 +266,10 @@ inline void pix2pix::train(int epoch, int device_id){
  	
 	Optimizer * Dadam = OptimizerRegistry::Find("adam");
 
-	Gadam->SetParam("lr", 0.00001);
+	Gadam->SetParam("lr", 0.00005);
 //		->SetParam("clip_gradient", 0.05);
 	
-	Dadam->SetParam("lr", 0.00001);
+	Dadam->SetParam("lr", 0.0001);
 //		->SetParam("clip_gradient", 0.05);
 	
 	bool dswitch = true;
@@ -280,9 +280,9 @@ inline void pix2pix::train(int epoch, int device_id){
 
 	vector <float> g_loss(1, 10);
 
-	float d_loss_obj = 0.1;
+	float d_loss_obj = 0.45;
 
-	float g_loss_obj = 0.1;
+	float g_loss_obj = 1;
 
 
 	for (long int i = iters_chkp; i != epoch; ++i){
@@ -443,7 +443,8 @@ inline void pix2pix::train(int epoch, int device_id){
 
 					fimage::save("patch_scalar_rt_by_ce/" + sample_list[ss].substr(0,3) + "_label.jpg", nd["c"], 255);
 					
-					//fimage::save("test2/L1" + to_string(i) + "_in.jpg", nd["inputs"], 255);
+					//fimage::save("patch_scalar_rt_by_ce" + to_string(i) + "_in.jpg", nd["inputs"], 255);
+					cv::imwrite("patch_scalar_rt_by_ce/" + sample_list[ss].substr(0,3) + "_in.jpg", inrimage);
 				}
 				
 				//cout << "nd['c']" << nd["c"] << endl;
